@@ -1,0 +1,230 @@
+CODE BEGINS!!
+
+import pyttsx3 #pip install pyttsx3
+import speech_recognition as sr #pip install SpeechRecognition
+import datetime
+import os
+import cv2 #pip install opencv-python
+import wikipedia
+import webbrowser
+import pywhatkit #pip install pywhatkit
+import sys
+import time 
+import pyautogui #pip install PyAutoGUI
+from bs4 import BeautifulSoup  #pip install bs4
+import requests  #pip install requests
+import instaloader #pip install instadownloader
+
+
+
+engine = pyttsx3.init('sapi5')
+voices = engine.getProperty('voices')
+engine.setProperty('voices', voices[0].id)
+
+def speak(audio):
+    engine.say(audio)
+    print(audio)
+    engine.runAndWait()
+
+def wish():
+    hour = int(datetime.datetime.now().hour)
+    tt = time.strftime("%I:%M %p")
+
+    if hour >= 0 and hour <= 12:
+        speak(f"Good Morning, its {tt}")
+    elif hour >= 12 and hour <= 18:
+        speak(f"Good Aftenoon, its {tt}")
+    else: 
+        speak(f"Good Evening, its {tt}")
+    speak("I am Jarvis Sir, Please Tell Me How May I Help You")
+
+
+def takecommand():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("listening...")
+        r.pause_threshold = 1
+        audio = r.listen(source,timeout=5,phrase_time_limit=5)
+
+    try:
+        print("Recognizing...")
+        query = r.recognize_google(audio, language='en-in')
+        print(f"user said: {query}")
+
+    except Exception as e:
+        speak("say that again please")
+        return "none"
+    return query
+
+if __name__ == "__main__":
+    wish()
+    while True:
+    #if 1:
+
+        query = takecommand().lower()
+
+        if 'open notepad' in query:
+            npath = "    " #change your path
+            os.startfile(npath)
+            speak("Done Sir, I have opened the notepad.")
+
+        elif 'open camera' in query:
+            cap = cv2.VideoCapture(0)
+            while True:
+                ret, img = cap.read()
+                cv2.imshow('webcam', img)
+                k = cv2.waitKey(50)
+                if k==27:
+                    break
+            cap.release()
+            cv2.destroyAllWindows()
+            speak("Done Sir, I Have Opened The Camera To Capture Your Beauty.")
+
+
+
+        elif 'who are you' in query:
+            speak("I Am Jarvis Your Personal AI Assistant.")
+
+        elif 'play music' in query:
+            music_dir = "E:\\Songs" #change path
+            songs = os.listdir(music_dir)
+            os.startfile(os.path.join(music_dir, songs[0]))
+            speak("Done Sir, I Played Your Beautiful Music.")
+
+        elif 'wikipedia' in query:
+            speak("Searching...")
+            query = query.replace("wikipedia", "")
+            results = wikipedia.summary(query, sentences=2)
+            speak("According to the wikipedia")
+            speak(results)
+            print(results)
+
+        elif 'open youtube' in query:
+            webbrowser.open("www.youtube.com")
+
+        elif 'channel' in query:
+            webbrowser.open("https://www.youtube.com/channel/UClmqvNCDyFqmCwp3llTiFww")
+            speak("Done Sir, Here's your channel still with those 80 subs. hehehahahaha!")
+
+        elif 'open google' in query:
+            speak("Sir, What should i search on google?")
+            cm = takecommand().lower()
+            webbrowser.open(f"{cm}")
+            speak("Done Sir.")
+     
+        elif 'bored' in query:
+            speak("Sir, You Should Play Games To Cure Your Boredom.")
+        
+        elif 'trending movies' in query:
+            speak("Spiderman NWH , Venom Let there be carnage. are the Famous Movies currently")
+
+        elif 'shut up' in query:
+            speak("Sir i try my best to satisfy you as an AI, but if their is any problem, tell me i will fix that, ASAP")
+        
+        elif 'sorry' in query:
+            speak("for what sir? We Are Just Like Virtual Besties. Aren't We?")
+        
+        elif 'car' in query:
+            speak("Yes Of Course Sir ,I Have Spent a lot of time with you, i know your favrouite car. which is GTR SKYLINE R34. ")
+
+        elif 'who made you' in query: #ye khud dekh liyo tu
+            speak("Tanmay Sharma Made Me. I was his unfinished project for months, but now he learnt programming very well, so i am getting improved.")
+        
+        elif 'play song on youtube' in query:
+            pywhatkit.playonyt("Kishore Kumar") #type song name replace kishore kumar
+
+        elif 'timer' in query or 'stopwatch' in query:
+            speak("For how many minutes?")
+            timing = takecommand()
+            timing =timing.replace('minutes', '')
+            timing = timing.replace('minute', '')
+            timing = timing.replace('for', '')
+            timing = float(timing)
+            timing = timing * 60
+            speak(f'I will remind you in {timing} seconds')
+
+            time.sleep(timing)
+            speak('Done Sir,')
+        
+
+        elif 'close notepad' in query:
+              speak("okay sir, closing notepad")
+              os.system("taskkill /f /im notepad.exe")
+
+        elif "set alarm" in query:
+            nn = int(datetime.datetime.now().hour)
+            if nn==22:
+                music_dir = 'E\\Songs'
+                songs = os.listdir(music_dir)
+                os.startfile(os.path.join(music_dir, songs[0]))
+
+        elif "shutdown the system" in query:
+            os.system("shutdown /s /t 5")
+            speak("Shutting Down Your PC, Sir.")
+
+        elif "restart the system" in query:
+            os.system("shutdown /r /t 5")
+
+        elif "sleep the system" in query:
+            os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+            
+
+        elif "switch the window" in query:
+            pyautogui.keyDown("alt")
+            pyautogui.press("tab")
+            time.sleep(1)
+            pyautogui.keyUp("alt")
+
+        elif "where i am" in query or "where we are" in query:
+            speak("wait sir, let me check")
+            try:
+                ipAdd = requests.get('https://api.ipify.org').text
+                print(ipAdd)
+                url = 'https://get/geojs.io/v1/ip/geo/'+ipAdd+'.json'
+                geo_requests = requests.get(url)
+                geo_data = geo_requests.json()
+                city = geo_data['city']
+                country = geo_data['country']
+                speak(f"sir i am not sure but i think we are in {city} city of {country} country of India")
+            except Exception as e:
+                speak("Sorry sir, due to network issue i am not able to find where we are.")
+                pass
+
+
+        elif "instagram profile" in query or "profile on instagram" in query:
+            speak("sir please enter the username of the profile correctly.")
+            name = input("Enter Username Here:")
+            webbrowser.open(f"www.instagram.com/{name}")
+            speak(f"Sir Here is the profile of {name}")
+            time.sleep(5)
+            speak("Sir, would you like to download the profile picture of this account?")
+            condition = takecommand().lower()
+            if "yes" in condition:
+                mod = instaloader.Instaloader()
+                mod.download_profile(name, profile_pic_only=True)
+                speak("Done Sir, i have downloaded the profile picture you should check it. I am ready for my next command.")
+            else:
+                pass
+
+        elif "take screenshot" in query or "take a screenshot" in query:
+            speak("sir, please tell me the name of the screenshot file")
+            name = takecommand().lower()
+            speak("please sir, hold the screen i am taking a screenshot")
+            time.sleep(3)
+            img = pyautogui.screenshot()
+            img.save(f"{name}.png")
+            speak("done sir, i have saved the screenshot.")
+
+        elif 'temperature' in query:
+            search = "temprature in delhi"
+            url = f"https://www.google.com/search?q={search}"
+            r = requests.get(url)
+            data = BeautifulSoup(r.text,'html.parser')
+            temp = data.find("div",class_="BNeawe").text
+            speak(f"current {search} is {temp}")
+
+
+
+        elif 'you can sleep' in query:
+            speak("Thanks for using me, i am always ready for your help. have a good day.")
+            sys.exit()
